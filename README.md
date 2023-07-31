@@ -22,3 +22,8 @@ Le serveur reçoit un message du client et l'affiche.
 
 ### V2
 Le serveur reçoit plusieurs clients en même temps
+
+
+### V3
+Les client peuvent se déconnecter en envoyant le message "!deco".
+
