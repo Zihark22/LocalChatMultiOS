@@ -7,7 +7,7 @@ int main(int argc, char const *argv[]) {
     struct sockaddr_in address;
     int opt = 1;
     int addrlen = sizeof(address);
-    char buffer[1024] = {0};
+    char buffer[TAILLE_BUF] = {0};
 
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         perror("Erreur de création du socket");
@@ -27,7 +27,6 @@ int main(int argc, char const *argv[]) {
         perror("Binding du socket a échoué");
         exit(EXIT_FAILURE);
     }
-
 
 	pid_t pid=getpid();
 	printf("Lancement du serveur !\n");
@@ -60,9 +59,9 @@ int main(int argc, char const *argv[]) {
 void *connection_handler(void *socket_desc) {
     int sock = *(int *)socket_desc;
     int valread;
-    char buffer[1024] = {0};
+    char buffer[TAILLE_BUF] = {0};
 
-    while((valread = read(sock, buffer, 1024)) > 0) {
+    while((valread = read(sock, buffer, TAILLE_BUF)) > 0) {
         printf("%s\n", buffer);
         send(sock, buffer, strlen(buffer), 0);
     }

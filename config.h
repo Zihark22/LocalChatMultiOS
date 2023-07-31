@@ -7,4 +7,8 @@
 #include <pthread.h>
 
 #define PORT 8080
+#define IPserveur "192.168.0.37"
 
+#define TAILLE_MSG 1024
+#define TAILLE_BUF TAILLE_MSG
+#define TAILLE_NOM 50

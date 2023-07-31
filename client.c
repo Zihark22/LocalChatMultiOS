@@ -3,12 +3,12 @@
 int main(int argc, char const *argv[]) {
     int sock = 0, valread;
     struct sockaddr_in serv_addr;
-    char buffer[1024] = {0};
-    char message[1024] = {0};
-    char name[50];
+    char buffer[TAILLE_BUF] = {0};
+    char message[TAILLE_MSG] = {0};
+    char name[TAILLE_NOM];
 
     printf("Veuillez entrer votre nom : ");
-    fgets(name, 50, stdin);
+    fgets(name, TAILLE_NOM, stdin);
     strtok(name, "\n");
 
     if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
@@ -19,7 +19,7 @@ int main(int argc, char const *argv[]) {
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(PORT);
 
-    if(inet_pton(AF_INET, "192.168.0.37", &serv_addr.sin_addr) <= 0) {
+    if(inet_pton(AF_INET, IPserveur, &serv_addr.sin_addr) <= 0) {
         printf("\nAdresse invalide/Adresse non supportée \n");
         return -1;
     }
@@ -37,10 +37,10 @@ int main(int argc, char const *argv[]) {
 
     while(1) {
         printf("Message : ");
-        fgets(message, 1024, stdin);
+        fgets(message, TAILLE_MSG, stdin);
         strtok(message, "\n");
 
-        char send_message[1074] = {0};
+        char send_message[TAILLE_MSG+TAILLE_NOM] = {0};
         sprintf(send_message, "%s : %s", name, message);
 
         send(sock, send_message, strlen(send_message), 0);
