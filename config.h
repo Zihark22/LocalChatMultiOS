@@ -12,3 +12,5 @@
 #define TAILLE_MSG 1024
 #define TAILLE_BUF TAILLE_MSG
 #define TAILLE_NOM 50
+
+#define NBR_CO_MAX 3

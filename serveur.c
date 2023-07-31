@@ -37,7 +37,7 @@ int main(int argc, char const *argv[]) {
 	printf("En attente de connexion d'un client ...\n\n");
 
     // Indique au socket qu'il est prêt à accepter les connexions entrantes des clients. Il peut mettre en attente jusqu'à 3 connexions en même temps, les autres sont refusées
-    if (listen(server_fd, 3) < 0) {
+    if (listen(server_fd, NBR_CO_MAX) < 0) {
         perror("Erreur dans l'attente d'une connexion");
         exit(EXIT_FAILURE);
     }
