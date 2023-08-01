@@ -104,62 +104,53 @@ void fin(int n) {
 void *connection_handler(void *socket_desc) {
     int sock = *(int *)socket_desc;
     int valread;
-    char buffer[TAILLE_BUF] = {0};
-
-    char *token;
-    char *nom;
-    char *msg;
+    char buffer[TAILLE_BUF];
+    string nom, msg;
 
     // Lecture des données à partir du socket dans le tampon
     while((valread = read(sock, buffer, TAILLE_BUF)) > 0) { // Bloquant
+        string newbuf(buffer);
+        
+        // Trouver la position du délimiteur (":")
+        size_t delimiterPos = newbuf.find(':');
 
-        // Sépare le msg
-        token = strtok(buffer, " ");
-        nom=token;
-        msg = strtok(NULL, "");
-        token = strtok(msg, " ");
-        msg = strtok(NULL, "");
+        // Extraire le nom et le message à partir de la chaîne d'entrée
+        nom = newbuf.substr(0, delimiterPos-1);
+        msg = newbuf.substr(delimiterPos + 2); // +2 pour ignorer l'espace après le délimiteur
 
         user.name=nom;
         checkClient(sock);
 
-        if(strcmp(msg,MSG_DECO)==0) {
-            printf("Client %s déconnecté\n", nom);
+        if(msg==MSG_DECO) {
+            cout << "Client " << nom << " déconnecté" << endl;
             popClient();
             if (compteurClients==1)
-                printf("Fin du chat !\n");
+                cout << "Fin du chat !" << endl;
             else if(compteurClients<1)
                 fin(compteurClients);
             break;
         }
         else {
-            printf("%s : %s\n",nom,msg); 
+            cout << nom << " : " << msg << endl; 
             // send(sock, buffer, strlen(buffer), 0);  // Envoye des données à travers le socket sock vers le destinataire connecté
         }
-
         for (int i = 0; i < TAILLE_BUF; i++)
-        {
-            buffer[i] = '\0';
-        }
+            buffer[i]='\0';
     }
 
     close(sock);         // destruction du socket client
     pthread_exit(NULL);  // destruction du thread
-    
 }
 
 void popClient() {
     int indice=compteurClients, i=0;
     for ( i = 0; i < compteurClients; ++i)
     {
-        if(tabClient[i].name==user.name && tabClient[i].ip==user.ip){
+        if(tabClient[i].name==user.name && tabClient[i].ip==user.ip)
             indice=i;
-        }  
     }
     for (i = indice; i < compteurClients; ++i)
-    {
         tabClient[i]=tabClient[i+1];
-    }
     compteurClients--;
 }
 void checkClient(int socket_desc) {
@@ -192,7 +183,7 @@ void afficheClients() {
     printf("\nListe des clients :\n");
     for(int i = 0; i < compteurClients; ++i)
     {
-        printf("\t%s\t-->\tIP = %s\n",tabClient[i].name.c_str(),tabClient[i].ip.c_str());
+        cout << "\t" << tabClient[i].name << "\t-->\tIP = " << tabClient[i].ip << endl;
     }
     printf("\n");
 }

@@ -3,7 +3,6 @@
 int main(int argc, char const *argv[]) {
     int sock = 0, valread;
     struct sockaddr_in serv_addr;
-    char buffer[TAILLE_BUF] = {0};
     char message[TAILLE_MSG] = {0};
     char name[TAILLE_NOM];
 
@@ -53,26 +52,24 @@ int main(int argc, char const *argv[]) {
     cout << "IP=" << client_ip << endl;
     printf("Bienvenu dans le chat !\n\n");
 
-    while(1) {
+    while(1)
+    {
         printf("Message : ");
         fgets(message, TAILLE_MSG, stdin); // Lie une ligne de texte à partir de l'entrée standard (stdin) et de la stocker dans le tampon message
         strtok(message, "\n"); // Découpe la chaîne de caractères message en sous-chaines délimités par "\n"
 
-        
         char send_message[TAILLE_MSG+TAILLE_NOM] = {0};
         sprintf(send_message, "%s : %s", name, message);
 
         // Envoye les données contenues dans la chaîne de caractères send_message à travers le socket sock vers le destinataire connecté
-        send(sock, send_message, strlen(send_message), 0);
-
-        printf("Message envoyé\n\n");
+        if(send(sock, send_message, strlen(send_message), 0))
+            printf("Message envoyé\n\n");
         
         if(strcmp(message,MSG_DECO)==0) {
-            // close(sock);
             printf("...\nDéconection!\n");
             break;
         }
-
-     }
+    }
+    close(sock);
     return 0;
 }
