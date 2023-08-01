@@ -1,4 +1,4 @@
-#include "config.h"
+#include "config.hpp"
 
 int main(int argc, char const *argv[]) {
     int sock = 0, valread;

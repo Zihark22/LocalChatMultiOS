@@ -1,7 +1,7 @@
-#include "config.h"
+#include "config.hpp"
 
 void *connection_handler(void *);
-void fin();
+void fin(int n);
 void popClient();
 void checkClient();
 void afficheClients();
@@ -83,7 +83,7 @@ int main(int argc, char const *argv[]) {
             exit(EXIT_FAILURE);
         }
 
-        printf("Processus %d créé pour la communication du client\n\n", (int) thread_id);
+        printf("Processus %ld créé pour la communication du client\n\n", (long) thread_id);
 
         if(compteurClients>NBR_CO_MAX) // limite de connexion 
         {
@@ -95,7 +95,7 @@ int main(int argc, char const *argv[]) {
     return 0;
 }
 
-void fin() {
+void fin(int n) {
 	fprintf(stderr, "\nTerminaison du serveur.\n");
 	exit(EXIT_SUCCESS);
 }
@@ -129,12 +129,17 @@ void *connection_handler(void *socket_desc) {
             if (compteurClients==1)
                 printf("Fin du chat !\n");
             else if(compteurClients<1)
-                fin();
+                fin(compteurClients);
             break;
         }
         else {
             printf("%s : %s\n",nom,msg); 
             // send(sock, buffer, strlen(buffer), 0);  // Envoye des données à travers le socket sock vers le destinataire connecté
+        }
+
+        for (int i = 0; i < TAILLE_BUF; i++)
+        {
+            buffer[i] = '\0';
         }
     }
 
@@ -166,7 +171,7 @@ void checkClient() {
         else
             cmpt++;
     }
-    if(cmpt==compteurClients) 
+    if(cmpt>=compteurClients) 
     {
         tabClient[compteurClients]=user;
         compteurClients++;
