@@ -10,7 +10,7 @@ Elle utilise le protocole TCP qui est plus fiable et sécurisé.
 
 - V1 : Connexion d'un client via socket entre client et serveur
 - V2 : Connexion de plusieurs clients avec reception du chat sur le serveur
-- V3 : Gestion de déconnexion des clients enregistrés
+- V3 : Gestion de déconnexion des clients
 - V4 : Blocage des clients en trop
 - V5 : Envoie du message reçu d'un client aux autres clients (Chat)
 - V6 :  
@@ -26,4 +26,7 @@ Le serveur reçoit plusieurs clients en même temps
 
 ### V3
 Les client peuvent se déconnecter en envoyant le message "!deco".
+
+### V4
+Enregistrement des clients pour vérifier s'il doit être bloqué
 

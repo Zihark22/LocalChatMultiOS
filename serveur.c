@@ -1,6 +1,7 @@
 #include "config.h"
 
 void *connection_handler(void *);
+void fin();
 
 int main(int argc, char const *argv[]) {
     int server_fd, new_socket, valread;
@@ -8,6 +9,21 @@ int main(int argc, char const *argv[]) {
     int opt = 1;
     int addrlen = sizeof(address);
     char buffer[TAILLE_BUF] = {0};
+
+    struct sigaction action;
+	Client *tabClient=NULL, user;
+	int sig, compteurClient=0,i=0;
+
+    // on commence par prevoir la terminaison sur signal du serveur
+	action.sa_handler = fin;
+	for(i=1; i<NSIG; i++) sigaction(i, &action, NULL);	// installation du handler de fin pour tous les signaux
+
+    // Tableau des clients connectés
+	tabClient=(Client*)malloc((NBR_CO_MAX+1)*sizeof(Client));
+	if(tabClient==NULL){
+		printf("Problème allocation\n");
+		exit(EXIT_FAILURE);
+	}
 
     // Création du socket IPv4(AF_INET) de type flux(SOCK_STREAM) en TCP (0) bidirectionel
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
@@ -59,8 +75,22 @@ int main(int argc, char const *argv[]) {
         }
 
         printf("Processus %d créé pour la communication du client\n\n", (int) thread_id);
+
+        // if(compteurClient>NBR_CO_MAX) // limite de connexion 
+        // {
+        //     printf("\nNombre de clients maximum déjà atteint.\n");
+        // }
+        // user.nom=;
+        // user.pid=;
+        // tabClient[compteurClient]=user;
+        // compteurClient++;
     }
     return 0;
+}
+
+void fin() {
+	fprintf(stderr, "\nTerminaison du serveur.\n");
+	exit(EXIT_SUCCESS);
 }
 
 void *connection_handler(void *socket_desc) {
@@ -68,18 +98,30 @@ void *connection_handler(void *socket_desc) {
     int valread;
     char buffer[TAILLE_BUF] = {0};
 
+    char *token;
+    char *nom;
+    char *msg;
+
     // Lecture des données à partir du socket dans le tampon
-    while((valread = read(sock, buffer, TAILLE_BUF)) > 0) {
-        printf("%s\n", buffer);
-        send(sock, buffer, strlen(buffer), 0);  // Envoye des données à travers le socket sock vers le destinataire connecté
+    while((valread = read(sock, buffer, TAILLE_BUF)) > 0) { // Bloquant
+
+        // Sépare le msg
+        token = strtok(buffer, " ");
+        nom=token;
+        msg = strtok(NULL, "");
+        token = strtok(msg, " ");
+        msg = strtok(NULL, "");
+
+        if(strcmp(msg,MSG_DECO)==0) {
+            printf("Client %s déconnecté\n", nom);
+            break;
+        }
+        else {
+            printf("%s : %s\n",nom,msg); 
+            // send(sock, buffer, strlen(buffer), 0);  // Envoye des données à travers le socket sock vers le destinataire connecté
+        }
     }
 
-    if (valread == 0) {
-        printf("Client déconnecté\n");
-    } else {
-        perror("Erreur dans la lecture de l'entrée");
-    }
-
-    close(sock);        // destruction du socket client
+    close(sock);         // destruction du socket client
     pthread_exit(NULL);  // destruction du thread
 }

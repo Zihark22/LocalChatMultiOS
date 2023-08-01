@@ -43,6 +43,7 @@ int main(int argc, char const *argv[]) {
         fgets(message, TAILLE_MSG, stdin); // Lie une ligne de texte à partir de l'entrée standard (stdin) et de la stocker dans le tampon message
         strtok(message, "\n"); // Découpe la chaîne de caractères message en sous-chaines délimités par "\n"
 
+        
         char send_message[TAILLE_MSG+TAILLE_NOM] = {0};
         sprintf(send_message, "%s : %s", name, message);
 
@@ -50,6 +51,13 @@ int main(int argc, char const *argv[]) {
         send(sock, send_message, strlen(send_message), 0);
 
         printf("Message envoyé\n\n");
+        
+        if(strcmp(message,MSG_DECO)==0) {
+            // close(sock);
+            printf("...\nDéconection!\n");
+            break;
+        }
+
      }
     return 0;
 }
