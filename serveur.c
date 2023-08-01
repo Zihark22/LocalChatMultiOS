@@ -2,11 +2,13 @@
 
 void *connection_handler(void *);
 void fin();
-void popClient(char *nom);
+void popClient();
 void checkClient();
+void afficheClients();
 
 int compteurClients;
-Client *tabClient, user;
+Client *tabClient;
+Client user;
 
 int main(int argc, char const *argv[]) {
     int server_fd, new_socket, valread;
@@ -82,7 +84,6 @@ int main(int argc, char const *argv[]) {
         }
 
         printf("Processus %d créé pour la communication du client\n\n", (int) thread_id);
-        compteurClients++;
 
         if(compteurClients>NBR_CO_MAX) // limite de connexion 
         {
@@ -118,11 +119,13 @@ void *connection_handler(void *socket_desc) {
         token = strtok(msg, " ");
         msg = strtok(NULL, "");
 
+        user.name=nom;
+        user.pid=compteurClients;
         checkClient();
 
         if(strcmp(msg,MSG_DECO)==0) {
             printf("Client %s déconnecté\n", nom);
-            popClient(nom);
+            popClient();
             if (compteurClients==1)
                 printf("Fin du chat !\n");
             else if(compteurClients<1)
@@ -140,8 +143,8 @@ void *connection_handler(void *socket_desc) {
     
 }
 
-void popClient(char *nom) {
-    int indice=i;
+void popClient() {
+    int indice=compteurClients, i=0;
     for ( i = 0; i < compteurClients; ++i)
     {
         if(tabClient[i].pid==user.pid){
@@ -155,7 +158,26 @@ void popClient(char *nom) {
     compteurClients--;
 }
 void checkClient() {
-    user.nom="test";
-    user.pid=1;
-    tabClient[compteurClients]=user;
+    int cmpt=0;
+    for(int i = 0; i < compteurClients; ++i)
+    {
+        if(user.pid==tabClient[i].pid)
+            break;
+        else
+            cmpt++;
+    }
+    if(cmpt==compteurClients) 
+    {
+        tabClient[compteurClients]=user;
+        compteurClients++;
+        afficheClients();
+    }
+}
+void afficheClients() {
+    printf("\nListe des clients :\n");
+    for(int i = 0; i < compteurClients; ++i)
+    {
+        printf("\t%s (%ld)\n",tabClient[i].name,tabClient[i].pid);
+    }
+    printf("\n");
 }

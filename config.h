@@ -25,5 +25,5 @@
 
 typedef struct {
 	long pid;				//	PID
-	char nom[TAILLE_NOM];   //	Nom de l'auteur
+	char *name;   //	Nom de l'auteur
 } Client;
