@@ -134,9 +134,9 @@ void *connection_handler(void *socket_desc) {
             cout << nom << " : " << msg << endl; 
             // send(sock, buffer, strlen(buffer), 0);  // Envoye des données à travers le socket sock vers le destinataire connecté
         }
+        for (int i = 0; i < TAILLE_BUF; i++)
+            buffer[i]='\0';
     }
-    for (int i = 0; i < TAILLE_BUF; i++)
-        buffer[i]='\0';
 
     close(sock);         // destruction du socket client
     pthread_exit(NULL);  // destruction du thread
