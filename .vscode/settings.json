@@ -5,6 +5,7 @@
         "functional": "c",
         "socket.h": "c",
         "iostream": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "iosfwd": "cpp"
     }
 }

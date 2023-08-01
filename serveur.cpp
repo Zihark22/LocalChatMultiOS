@@ -136,13 +136,14 @@ void *connection_handler(void *socket_desc) {
         }
         else {
             // Afficher le message
-            cout << TXT_CYAN_U << nom << DEFAULT << " : " << msg << endl;
+            string newbuffer = user.color + nom + DEFAULT + " : " + msg;
+            cout << newbuffer << endl;
 
             // Diffuser le message à tous les autres clients connectés
             for(int i = 0; i < compteurClients; ++i)
             {
                 if(tabClient[i].name!=user.name || tabClient[i].ip!=user.ip)
-                    send(tabClient[i].socket, buffer, strlen(buffer), 0);
+                    send(tabClient[i].socket, newbuffer.c_str(), strlen(newbuffer.c_str()), 0);
             }
         }
         for (int i = 0; i < TAILLE_BUF; i++)
@@ -179,6 +180,7 @@ void checkClient(int socket_desc) {
     if(cmpt==compteurClients) 
     {
         compteurClients++;
+        user.color="\x1b["+to_string(31+compteurClients)+"m";
         if(compteurClients>NBR_CO_MAX) // limite de connexion 
         {
             printf("\nNombre de clients maximum déjà atteint.\n");

@@ -82,7 +82,6 @@ int main(int argc, char const *argv[]) {
         cout << "Moi : ";
 
         if(strcmp(message,MSG_DECO)==0) {
-            cout << "\x1b[1A";
             printf("\n...\nDéconection!\n");
             break;
         }
