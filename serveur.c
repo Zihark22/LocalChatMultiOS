@@ -122,7 +122,6 @@ void *connection_handler(void *socket_desc) {
 
         if(strcmp(msg,MSG_DECO)==0) {
             printf("Client %s déconnecté\n", nom);
-            compteurClients--;
             popClient(nom);
             if (compteurClients==1)
                 printf("Fin du chat !\n");
@@ -142,8 +141,21 @@ void *connection_handler(void *socket_desc) {
 }
 
 void popClient(char *nom) {
-
+    int indice=i;
+    for ( i = 0; i < compteurClients; ++i)
+    {
+        if(tabClient[i].pid==user.pid){
+            indice=i;
+        }  
+    }
+    for (i = indice; i < compteurClients; ++i)
+    {
+        tabClient[i]=tabClient[i+1];
+    }
+    compteurClients--;
 }
 void checkClient() {
-
+    user.nom="test";
+    user.pid=1;
+    tabClient[compteurClients]=user;
 }
