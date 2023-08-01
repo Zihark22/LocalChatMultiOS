@@ -9,10 +9,10 @@ clear && printf '\e[3J' ;
 compile=false;
 
 
-gcc -o serveur_Mac serveur.c  # compilation serveur
+g++ -o serveur_Mac serveur.cpp  # compilation serveur
 if [ $? -eq 0 ]; then
   echo "\033[36mCompilation server sucessful \033[0m"
-  gcc -o client_Mac client.c  # compilation client
+  g++ -o client_Mac client.cpp  # compilation client
   if [ $? -eq 0 ]; then
     echo "\033[36mCompilation client sucessful \033[0m"
   else
