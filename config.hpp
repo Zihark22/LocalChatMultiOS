@@ -5,6 +5,7 @@
 #include <signal.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <netinet/in.h>
 #include <sys/types.h>
 #include <pthread.h>
 #include <sys/ipc.h>
@@ -13,6 +14,9 @@
 #include <fcntl.h>
 #include <sys/wait.h>
 
+#include <iostream>
+#include <string>
+
 #define PORT 8080
 #define IPserveur "192.168.0.37"
 
@@ -20,10 +24,12 @@
 #define TAILLE_BUF TAILLE_MSG
 #define TAILLE_NOM 50
 
-#define NBR_CO_MAX 3
+#define NBR_CO_MAX 2
 #define MSG_DECO "!deco" // msg de deconection
 
-typedef struct {
-	long pid;				//	PID
-	char *name;   //	Nom de l'auteur
+using namespace std;
+
+typedef struct {  
+	string name;   
+	string ip;     
 } Client;

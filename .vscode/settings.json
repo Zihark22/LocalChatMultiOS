@@ -3,6 +3,7 @@
         "__locale": "c",
         "chrono": "c",
         "functional": "c",
-        "socket.h": "c"
+        "socket.h": "c",
+        "iostream": "cpp"
     }
 }

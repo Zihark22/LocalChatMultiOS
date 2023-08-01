@@ -3,7 +3,7 @@
 void *connection_handler(void *);
 void fin(int n);
 void popClient();
-void checkClient();
+void checkClient(int socket_desc);
 void afficheClients();
 
 int compteurClients;
@@ -13,9 +13,9 @@ Client user;
 int main(int argc, char const *argv[]) {
     int server_fd, new_socket, valread;
     struct sockaddr_in address;
-    int opt = 1;
     int addrlen = sizeof(address);
     char buffer[TAILLE_BUF] = {0};
+    int opt = 1;
 
     struct sigaction action;
 	int sig,i=0;
@@ -46,9 +46,9 @@ int main(int argc, char const *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    address.sin_family = AF_INET;
-    address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(PORT);
+    address.sin_family = AF_INET;           // IPv4
+    address.sin_addr.s_addr = INADDR_ANY;   // Socket sera lié à toutes les interfaces réseau disponibles sur la machine (c'est-à-dire qu'il sera accessible via toutes les adresses IP de la machine)
+    address.sin_port = htons(PORT);         // Convertir l'entier court (le numéro de port) en une représentation réseau. C'est nécessaire pour assurer que l'ordre des octets est correct pour le réseau (car le réseau utilise généralement l'ordre des octets en réseau, également appelé "big-endian")
 
     // Association d'une adresse au socket, afin qu'il puisse écouter les connexions entrantes sur cette adresse spécifique.
     if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
@@ -56,7 +56,9 @@ int main(int argc, char const *argv[]) {
         exit(EXIT_FAILURE);
     }
 
+    // Récupération du PID
 	pid_t pid=getpid();
+
 	printf("Lancement du serveur !\n");
 	printf("PID=%d\n", pid);
 	printf("En attente de connexion d'un client ...\n\n");
@@ -69,10 +71,16 @@ int main(int argc, char const *argv[]) {
 
     while(1) {
         // Accepte une connexion entrante sur le socket et de créer un nouveau socket pour gérer cette connexion avec le client
-        if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {  // Bloquant
+        if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0 && compteurClients>=NBR_CO_MAX) {  // Bloquant
             perror("Erreur accepté de la connexion");
             exit(EXIT_FAILURE);
         }
+
+        // Récupérer l'adresse IP du client
+        char client_ip[INET_ADDRSTRLEN];
+        inet_ntop(AF_INET, &(address.sin_addr), client_ip, INET_ADDRSTRLEN);
+        printf("Client connecté avec l'adresse IP : %s\n", client_ip);
+        user.ip=client_ip;
 
         pthread_t thread_id;
         printf("Connexion acceptée\n");
@@ -84,13 +92,6 @@ int main(int argc, char const *argv[]) {
         }
 
         printf("Processus %ld créé pour la communication du client\n\n", (long) thread_id);
-
-        if(compteurClients>NBR_CO_MAX) // limite de connexion 
-        {
-            printf("\nNombre de clients maximum déjà atteint.\n");
-        }
-        else if(compteurClients==2)
-			printf("Début du chat !\n");
     }
     return 0;
 }
@@ -120,8 +121,7 @@ void *connection_handler(void *socket_desc) {
         msg = strtok(NULL, "");
 
         user.name=nom;
-        user.pid=compteurClients;
-        checkClient();
+        checkClient(sock);
 
         if(strcmp(msg,MSG_DECO)==0) {
             printf("Client %s déconnecté\n", nom);
@@ -152,7 +152,7 @@ void popClient() {
     int indice=compteurClients, i=0;
     for ( i = 0; i < compteurClients; ++i)
     {
-        if(tabClient[i].pid==user.pid){
+        if(tabClient[i].name==user.name && tabClient[i].ip==user.ip){
             indice=i;
         }  
     }
@@ -162,27 +162,37 @@ void popClient() {
     }
     compteurClients--;
 }
-void checkClient() {
+void checkClient(int socket_desc) {
     int cmpt=0;
     for(int i = 0; i < compteurClients; ++i)
     {
-        if(user.pid==tabClient[i].pid)
+        if(tabClient[i].name==user.name && tabClient[i].ip==user.ip)
             break;
         else
             cmpt++;
     }
-    if(cmpt>=compteurClients) 
+    if(cmpt==compteurClients) 
     {
-        tabClient[compteurClients]=user;
         compteurClients++;
-        afficheClients();
+        if(compteurClients>NBR_CO_MAX) // limite de connexion 
+        {
+            printf("\nNombre de clients maximum déjà atteint.\n");
+            close(socket_desc);
+            pthread_exit(NULL);
+        }
+        else 
+        { 
+            tabClient[compteurClients-1]=user;
+            afficheClients();
+            if(compteurClients==2) printf("Début du chat !\n");
+        }
     }
 }
 void afficheClients() {
     printf("\nListe des clients :\n");
     for(int i = 0; i < compteurClients; ++i)
     {
-        printf("\t%s (%ld)\n",tabClient[i].name,tabClient[i].pid);
+        printf("\t%s\t-->\tIP = %s\n",tabClient[i].name.c_str(),tabClient[i].ip.c_str());
     }
     printf("\n");
 }

@@ -32,10 +32,25 @@ int main(int argc, char const *argv[]) {
         return -1;
     }
 
+    // Obtenir l'adresse IP du serveur
+    struct sockaddr_in server_addr;
+    socklen_t addr_length = sizeof(server_addr);
+    if (getsockname(sock, (struct sockaddr *)&server_addr, &addr_length) == -1) {
+        perror("Erreur lors de l'obtention de l'adresse IP du serveur");
+        close(sock);
+        return 1;
+    }
+    char client_ip[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &(server_addr.sin_addr), client_ip, INET_ADDRSTRLEN);
+
+    // Obtenir PID
     pid_t pidP=getpid();
+
+    // Affichage
     printf("\nClient opérationnel\n");
     printf("Nom client: %s\n",name);
     printf("PID=%d\n",pidP);
+    cout << "IP=" << client_ip << endl;
     printf("Bienvenu dans le chat !\n\n");
 
     while(1) {
