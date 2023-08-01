@@ -104,18 +104,19 @@ void fin(int n) {
 void *connection_handler(void *socket_desc) {
     int sock = *(int *)socket_desc;
     int valread;
-    string buffer, nom, msg;
+    char buffer[TAILLE_BUF];
+    string nom, msg;
 
     // Lecture des données à partir du socket dans le tampon
-    while((valread = read(sock, &buffer, buffer.size())) > 0) { // Bloquant
-
-        cout << "buffer=" << buffer << endl;
+    while((valread = read(sock, buffer, TAILLE_BUF)) > 0) { // Bloquant
+        string newbuf(buffer);
+        
         // Trouver la position du délimiteur (":")
-        size_t delimiterPos = buffer.find(':');
+        size_t delimiterPos = newbuf.find(':');
 
         // Extraire le nom et le message à partir de la chaîne d'entrée
-        nom = buffer.substr(0, delimiterPos-1);
-        msg = buffer.substr(delimiterPos + 2); // +2 pour ignorer l'espace après le délimiteur
+        nom = newbuf.substr(0, delimiterPos-1);
+        msg = newbuf.substr(delimiterPos + 2); // +2 pour ignorer l'espace après le délimiteur
 
         user.name=nom;
         checkClient(sock);
@@ -134,6 +135,8 @@ void *connection_handler(void *socket_desc) {
             // send(sock, buffer, strlen(buffer), 0);  // Envoye des données à travers le socket sock vers le destinataire connecté
         }
     }
+    for (int i = 0; i < TAILLE_BUF; i++)
+        buffer[i]='\0';
 
     close(sock);         // destruction du socket client
     pthread_exit(NULL);  // destruction du thread
