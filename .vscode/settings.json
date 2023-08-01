@@ -4,6 +4,12 @@
         "chrono": "c",
         "functional": "c",
         "socket.h": "c",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "string": "cpp",
+        "queue": "cpp",
+        "stack": "cpp",
+        "random": "cpp",
+        "ostream": "cpp",
+        "iosfwd": "cpp"
     }
 }
