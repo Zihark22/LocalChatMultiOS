@@ -4,6 +4,7 @@
         "chrono": "c",
         "functional": "c",
         "socket.h": "c",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "ostream": "cpp"
     }
 }

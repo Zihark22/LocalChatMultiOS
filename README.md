@@ -14,7 +14,9 @@ Elle utilise le protocole TCP qui est plus fiable et sécurisé.
 - V4 : Blocage des clients en trop
 - V5 : Envoie du message reçu d'un client aux autres clients (Chat)
 - V6 : Login des utilisateurs via un fichier 
+- V7 : Passage du réseau local à internet (sécuriser et adapter)
 
+idées : ajout de couleur , passage sous ncurses
 
 ### V1
 Le serveur reçoit un message du client et l'affiche.

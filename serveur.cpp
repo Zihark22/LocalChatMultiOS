@@ -15,11 +15,9 @@ int main(int argc, char const *argv[]) {
     struct sockaddr_in address;
     int addrlen = sizeof(address);
     char buffer[TAILLE_BUF] = {0};
-    int opt = 1;
-
+    int opt = 1,sig,i=0;
     struct sigaction action;
-	int sig,i=0;
-
+	
     tabClient=NULL;
     compteurClients=0;
 
@@ -81,16 +79,14 @@ int main(int argc, char const *argv[]) {
         inet_ntop(AF_INET, &(address.sin_addr), client_ip, INET_ADDRSTRLEN);
         printf("Client connecté avec l'adresse IP : %s\n", client_ip);
         user.ip=client_ip;
-
-        pthread_t thread_id;
-        printf("Connexion acceptée\n");
+        user.socket=new_socket;
 
         // Création d'un nouveau thread en parallèle au thread principal pour gérer une connexion client dans un environnement multithread
+        pthread_t thread_id;
         if (pthread_create(&thread_id, NULL, connection_handler, (void *)&new_socket) < 0) {
             perror("Erreur de création d'un processus pour le client");
             exit(EXIT_FAILURE);
         }
-
         printf("Processus %ld créé pour la communication du client\n\n", (long) thread_id);
     }
     return 0;
@@ -124,15 +120,26 @@ void *connection_handler(void *socket_desc) {
         if(msg==MSG_DECO) {
             cout << "Client " << nom << " déconnecté" << endl;
             popClient();
+            send(sock, MSG_DECO, strlen(buffer), 0);
             if (compteurClients==1)
                 cout << "Fin du chat !" << endl;
             else if(compteurClients<1)
                 fin(compteurClients);
             break;
         }
+        else if(msg=="co") { // premier message auto pour enregistrer client
+            
+        }
         else {
-            cout << nom << " : " << msg << endl; 
-            // send(sock, buffer, strlen(buffer), 0);  // Envoye des données à travers le socket sock vers le destinataire connecté
+            // Afficher le message
+            cout << TXT_CYAN_U << nom << DEFAULT << " : " << msg << endl;
+
+            // Diffuser le message à tous les autres clients connectés
+            for(int i = 0; i < compteurClients; ++i)
+            {
+                if(tabClient[i].name!=user.name || tabClient[i].ip!=user.ip)
+                    send(tabClient[i].socket, buffer, strlen(buffer), 0);
+            }
         }
         for (int i = 0; i < TAILLE_BUF; i++)
             buffer[i]='\0';
@@ -153,12 +160,15 @@ void popClient() {
         tabClient[i]=tabClient[i+1];
     compteurClients--;
 }
+
 void checkClient(int socket_desc) {
     int cmpt=0;
     for(int i = 0; i < compteurClients; ++i)
     {
-        if(tabClient[i].name==user.name && tabClient[i].ip==user.ip)
+        if(tabClient[i].name==user.name && tabClient[i].ip==user.ip) {
+            user=tabClient[i];
             break;
+        }
         else
             cmpt++;
     }
@@ -174,11 +184,13 @@ void checkClient(int socket_desc) {
         else 
         { 
             tabClient[compteurClients-1]=user;
+            user=tabClient[compteurClients-1];
             afficheClients();
             if(compteurClients==2) printf("Début du chat !\n");
         }
     }
 }
+
 void afficheClients() {
     printf("\nListe des clients :\n");
     for(int i = 0; i < compteurClients; ++i)
