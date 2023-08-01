@@ -2,6 +2,11 @@
 
 void *connection_handler(void *);
 void fin();
+void popClient(char *nom);
+void checkClient();
+
+int compteurClients;
+Client *tabClient, user;
 
 int main(int argc, char const *argv[]) {
     int server_fd, new_socket, valread;
@@ -11,8 +16,10 @@ int main(int argc, char const *argv[]) {
     char buffer[TAILLE_BUF] = {0};
 
     struct sigaction action;
-	Client *tabClient=NULL, user;
-	int sig, compteurClient=0,i=0;
+	int sig,i=0;
+
+    tabClient=NULL;
+    compteurClients=0;
 
     // on commence par prevoir la terminaison sur signal du serveur
 	action.sa_handler = fin;
@@ -20,7 +27,7 @@ int main(int argc, char const *argv[]) {
 
     // Tableau des clients connectés
 	tabClient=(Client*)malloc((NBR_CO_MAX+1)*sizeof(Client));
-	if(tabClient==NULL){
+	if(tabClient==NULL) {
 		printf("Problème allocation\n");
 		exit(EXIT_FAILURE);
 	}
@@ -75,15 +82,14 @@ int main(int argc, char const *argv[]) {
         }
 
         printf("Processus %d créé pour la communication du client\n\n", (int) thread_id);
+        compteurClients++;
 
-        // if(compteurClient>NBR_CO_MAX) // limite de connexion 
-        // {
-        //     printf("\nNombre de clients maximum déjà atteint.\n");
-        // }
-        // user.nom=;
-        // user.pid=;
-        // tabClient[compteurClient]=user;
-        // compteurClient++;
+        if(compteurClients>NBR_CO_MAX) // limite de connexion 
+        {
+            printf("\nNombre de clients maximum déjà atteint.\n");
+        }
+        else if(compteurClients==2)
+			printf("Début du chat !\n");
     }
     return 0;
 }
@@ -112,8 +118,16 @@ void *connection_handler(void *socket_desc) {
         token = strtok(msg, " ");
         msg = strtok(NULL, "");
 
+        checkClient();
+
         if(strcmp(msg,MSG_DECO)==0) {
             printf("Client %s déconnecté\n", nom);
+            compteurClients--;
+            popClient(nom);
+            if (compteurClients==1)
+                printf("Fin du chat !\n");
+            else if(compteurClients<1)
+                fin();
             break;
         }
         else {
@@ -124,4 +138,12 @@ void *connection_handler(void *socket_desc) {
 
     close(sock);         // destruction du socket client
     pthread_exit(NULL);  // destruction du thread
+    
+}
+
+void popClient(char *nom) {
+
+}
+void checkClient() {
+
 }
