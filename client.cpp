@@ -67,6 +67,7 @@ int main(int argc, char const *argv[]) {
     }
     printf("Processus %ld créé pour la communication du serveur\n", (long) thread_id);
     cout << endl;
+    cout << "Moi : ";
 
     while(1)
     {
@@ -78,11 +79,11 @@ int main(int argc, char const *argv[]) {
 
         // Envoye les données contenues dans la chaîne de caractères send_message à travers le socket sock vers le destinataire connecté
         send(sock, send_message, strlen(send_message), 0);
-        
+        cout << "Moi : ";
 
         if(strcmp(message,MSG_DECO)==0) {
+            cout << "\x1b[1A";
             printf("\n...\nDéconection!\n");
-            cout << TXT_RED_B << "\n...\nDéconection!" << DEFAULT << endl;
             break;
         }
     }
@@ -101,8 +102,10 @@ void *reception_handler(void *socket_desc) {
         string newbuf(buffer);
         if(newbuf==MSG_DECO)
             break;
-            
-        cout << TXT_CYAN_U << newbuf << DEFAULT << endl;
+        cout << endl;
+        cout << "\x1b[1A";
+        cout << "\x1b[1L";
+        cout << newbuf << endl;
     
         for (int i = 0; i < TAILLE_BUF; i++)
             buffer[i]='\0';

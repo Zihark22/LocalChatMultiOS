@@ -93,6 +93,10 @@ int main(int argc, char const *argv[]) {
 }
 
 void fin(int n) {
+    for(int i = 0; i < compteurClients; ++i)
+    {
+        close(tabClient[i].socket);
+    }
 	fprintf(stderr, "\nTerminaison du serveur.\n");
 	exit(EXIT_SUCCESS);
 }

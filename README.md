@@ -16,7 +16,7 @@ Elle utilise le protocole TCP qui est plus fiable et sécurisé.
 - V6 : Login des utilisateurs via un fichier 
 - V7 : Passage du réseau local à internet (sécuriser et adapter)
 
-idées : ajout de couleur , passage sous ncurses
+idées : ajout de couleur pour chaque client , passage sous ncurses, voir les autres clients connectés
 
 ### V1
 Le serveur reçoit un message du client et l'affiche.
