@@ -38,6 +38,9 @@ typedef struct {
 	int socket;
 } Client;
 
+
+enum {NOIR,ROUGE,VERT,JAUNE,BLEU,MAGENTA,CYAN,BLANC};
+
 // Séquences d'échappement ANSI 
 #define DEFAULT "\x1b[0m" 		// retour à la normale
 #define TXT_CYAN_U "\x1b[36;4m" // texte en cyan sous-ligné

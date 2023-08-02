@@ -21,7 +21,6 @@ int main(int argc, char const *argv[]) {
     noecho();   // désactive l'affichage auto des caractères saisies
     keypad(stdscr, TRUE); // récupère les touches additionnelles 
     start_color();
-    init_pair(1, COLOR_RED, COLOR_BLACK); // paire 1 = caractere noire sur fond rouge
 
     // on commence par prevoir la terminaison sur signal du serveur
 	action.sa_handler = fin;
@@ -91,12 +90,12 @@ int main(int argc, char const *argv[]) {
 
         string send_message = name + " : " + message;
 
-        // Envoye les données contenues dans la chaîne de caractères send_message à travers le socket sock vers le destinataire connecté
-        send(sock, send_message.c_str(), strlen(send_message.c_str()), 0);
-
         printw("\n");
         if(message==MSG_DECO)
             break;
+
+        // Envoye les données contenues dans la chaîne de caractères send_message à travers le socket sock vers le destinataire connecté
+        send(sock, send_message.c_str(), strlen(send_message.c_str()), 0);
     }
     fin(0);
     return 0;

@@ -24,7 +24,10 @@ int main(int argc, char const *argv[]) {
     noecho();   // désactive l'affichage auto des caractères saisies
     keypad(stdscr, TRUE); // récupère les touches additionnelles 
     start_color();
-    init_pair(1, COLOR_RED, COLOR_BLACK); // paire 1 = caractere noire sur fond rouge
+    for (int i = 0; i < 8; i++)
+    {
+        init_pair( i , i , COLOR_BLACK );
+    }
 
     tabClient=NULL;
     compteurClients=0;
@@ -65,9 +68,11 @@ int main(int argc, char const *argv[]) {
     // Récupération du PID
 	pid_t pid=getpid();
 
+    attron(COLOR_PAIR(JAUNE));
 	printw("Lancement du serveur !\n");
 	printw("PID=%d\n", pid);
 	printw("En attente de connexion d'un client ...\n\n");
+    attroff(COLOR_PAIR(JAUNE));
 
     // Indique au socket qu'il est prêt à accepter les connexions entrantes des clients. Il peut mettre en attente jusqu'à 3 connexions en même temps, les autres sont refusées
     if (listen(server_fd, NBR_CO_MAX) < 0) {
@@ -151,7 +156,13 @@ void *connection_handler(void *socket_desc) {
         else {
             // Afficher le message
             string newbuffer = nom + " : " + msg;
-            printw("%s\n",newbuffer.c_str());
+            attron(COLOR_PAIR(ROUGE));
+            printw("%s",nom.c_str());
+            attroff(COLOR_PAIR(ROUGE));
+            printw(" : ");
+            attron(COLOR_PAIR(BLEU));
+            printw("%s\n",msg.c_str());
+            attroff(COLOR_PAIR(BLEU));
             refresh();
 
             // Diffuser le message à tous les autres clients connectés
@@ -196,7 +207,7 @@ void checkClient(int socket_desc) {
     if(cmpt==compteurClients) 
     {
         compteurClients++;
-        user.color="\x1b["+to_string(31+compteurClients)+"m";
+        user.color=to_string(31+compteurClients);
         if(compteurClients>NBR_CO_MAX) // limite de connexion 
         {
             printw("\nNombre de clients maximum déjà atteint.\n");
@@ -215,11 +226,13 @@ void checkClient(int socket_desc) {
 }
 
 void afficheClients() {
+    attron(COLOR_PAIR(CYAN));
     printw("Liste des clients :\n");
     for(int i = 0; i < compteurClients; ++i)
     {
         printw("\t%s\t\t-->\tIP = %s\n", tabClient[i].name.c_str(), tabClient[i].ip.c_str());
     }
     printw("\n");
+    attroff(COLOR_PAIR(CYAN));
     refresh();
 }
