@@ -13,6 +13,7 @@
 #include <time.h>
 #include <fcntl.h>
 #include <sys/wait.h>
+#include <cstdlib>  // Pour la fonction system()
 
 #include <iostream>
 #include <string>

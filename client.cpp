@@ -77,6 +77,10 @@ int main(int argc, char const *argv[]) {
     printw("IP=",client_ip);
     printw("Bienvenu dans le chat !\n\n");
     attroff(COLOR_PAIR(JAUNE));
+    refresh();
+
+    string commande = "say Le client sait connecté au serveur. Bienvenu dans la discussion " + name;
+    system(commande.c_str());
 
     char send_message[TAILLE_MSG+TAILLE_NOM] = {0};
     sprintf(send_message, "%s : %s", name.c_str(), "co");
@@ -130,6 +134,16 @@ void *reception_handler(void *socket_desc) {
         attron(COLOR_PAIR(ROUGE));
         printw("\nMoi : ");
         refresh();
+
+        // Trouver la position du délimiteur (":")
+        size_t delimiterPos = newbuf.find(':');
+
+        // Extraire le nom et le message à partir de la chaîne d'entrée
+        string newnom = newbuf.substr(0, delimiterPos-1);
+        string newmsg = newbuf.substr(delimiterPos + 2); // +2 pour ignorer l'espace après le délimiteur
+
+        string commande = "say " + newnom + " dit " + newmsg;
+        system(commande.c_str());
     
         for (int i = 0; i < TAILLE_BUF; i++)
             buffer[i]='\0';

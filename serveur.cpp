@@ -74,6 +74,9 @@ int main(int argc, char const *argv[]) {
 	printw("PID=%d\n", pid);
 	printw("En attente de connexion d'un client ...\n\n");
     attroff(COLOR_PAIR(JAUNE));
+    refresh();
+
+    system("say Lancement du serveur. En attente de connexion dun client");
 
     // Indique au socket qu'il est prêt à accepter les connexions entrantes des clients. Il peut mettre en attente jusqu'à 3 connexions en même temps, les autres sont refusées
     if (listen(server_fd, NBR_CO_MAX) < 0) {
