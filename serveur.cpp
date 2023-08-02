@@ -26,7 +26,6 @@ int main(int argc, char const *argv[]) {
     start_color();
     init_pair(1, COLOR_RED, COLOR_BLACK); // paire 1 = caractere noire sur fond rouge
 
-
     tabClient=NULL;
     compteurClients=0;
 
@@ -109,7 +108,7 @@ void fin(int n) {
         close(tabClient[i].socket);
     }
     endwin(); // Nettoyage de ncurses
-	printf("\nTerminaison du serveur.\n");
+	printf("Terminaison du serveur\n");
 	exit(EXIT_SUCCESS);
 }
 
@@ -136,11 +135,11 @@ void *connection_handler(void *socket_desc) {
         checkClient(sock);
 
         if(msg==MSG_DECO) {
-            printw("Client " nom << " déconnecté" << endl;
+            printw("Client ",nom.c_str()," déconnecté");
             popClient();
             send(sock, MSG_DECO, strlen(buffer), 0);
             if (compteurClients==1)
-                cout << "Fin du chat !" << endl;
+                printw("------- Fin du chat ! -------");
             else if(compteurClients<1)
                 fin(compteurClients);
             break;
@@ -150,8 +149,9 @@ void *connection_handler(void *socket_desc) {
         }
         else {
             // Afficher le message
-            string newbuffer = user.color + nom + DEFAULT + " : " + msg;
-            cout << newbuffer << endl;
+            string newbuffer = nom + " : " + msg;
+            printw("%s\n",newbuffer.c_str());
+            refresh();
 
             // Diffuser le message à tous les autres clients connectés
             for(int i = 0; i < compteurClients; ++i)
@@ -206,16 +206,18 @@ void checkClient(int socket_desc) {
             tabClient[compteurClients-1]=user;
             user=tabClient[compteurClients-1];
             afficheClients();
-            if(compteurClients==2) printw("Début du chat !\n");
+            if(compteurClients==2) printw("------- Début du chat ! -------\n\n");
         }
     }
+    refresh();
 }
 
 void afficheClients() {
-    printw("\nListe des clients :\n");
+    printw("Liste des clients :\n");
     for(int i = 0; i < compteurClients; ++i)
     {
-        cout << "\t" << tabClient[i].name << "\t-->\tIP = " << tabClient[i].ip << endl;
+        printw("\t%s\t\t-->\tIP = %s\n", tabClient[i].name.c_str(), tabClient[i].ip.c_str());
     }
     printw("\n");
+    refresh();
 }

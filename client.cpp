@@ -2,11 +2,14 @@
 
 void *reception_handler(void *socket_desc);
 string saisie(string message);
+void fin(int sock);
+
 
 int main(int argc, char const *argv[]) {
-    int sock = 0, valread;
+    int valread,sock=0;
     struct sockaddr_in serv_addr;
     string name, message;
+    struct sigaction action;
 
     // Initialisation de ncurses
     initscr(); // initialise ncurses et prépare affichage
@@ -15,6 +18,10 @@ int main(int argc, char const *argv[]) {
     keypad(stdscr, TRUE); // récupère les touches additionnelles 
     start_color();
     init_pair(1, COLOR_RED, COLOR_BLACK); // paire 1 = caractere noire sur fond rouge
+
+    // on commence par prevoir la terminaison sur signal du serveur
+	action.sa_handler = fin;
+	for(int i=1; i<NSIG; i++) sigaction(i, &action, NULL);	// installation du handler de fin pour tous les signaux
 
     name=saisie("Entrez votre nom : ");
 
@@ -54,10 +61,11 @@ int main(int argc, char const *argv[]) {
     pid_t pidP=getpid();
 
     // Affichage
-    printw("\nClient opérationnel\n");
+    move(0,0); // Déplace le curseur au début de la ligne courante
+    printw("Client opérationnel\n");
     printw("Nom client: %s\n",name.c_str());
     printw("PID=%d\n",pidP);
-    cout << "IP=" << client_ip << endl;
+    printw("IP=",client_ip);
     printw("Bienvenu dans le chat !\n\n");
 
 
@@ -71,9 +79,7 @@ int main(int argc, char const *argv[]) {
         perror("Erreur de création d'un processus pour le client");
         exit(EXIT_FAILURE);
     }
-    printw("Processus %ld créé pour la communication du serveur\n", (long) thread_id);
-    cout << endl;
-    cout << "Moi : ";
+    printw("Processus %lucréé pour la communication du serveur\n\n", (unsigned long int)thread_id);
 
     while(1)
     {
@@ -83,13 +89,10 @@ int main(int argc, char const *argv[]) {
 
         // Envoye les données contenues dans la chaîne de caractères send_message à travers le socket sock vers le destinataire connecté
         send(sock, send_message.c_str(), strlen(send_message.c_str()), 0);
-        cout << "Moi : ";
 
-        if(message==MSG_DECO) {
-            endwin(); // Nettoyage de ncurses
-            printf("...\nDéconection!\n");
-            break;
-        }
+        printw("\n");
+        if(message==MSG_DECO)
+            fin(sock);
     }
     return 0;
 }
@@ -103,19 +106,19 @@ void *reception_handler(void *socket_desc) {
     // Lecture des données à partir du socket dans le tampon
     while(1) { 
         valread = read(sock, buffer, TAILLE_BUF); // Bloquant
-        refresh(); // Rafraîchir l'écran
         string newbuf(buffer);
         if(newbuf==MSG_DECO)
             break;
-        cout << endl;
-        cout << "\x1b[1A";
-        cout << "\x1b[1L";
-        cout << newbuf << endl;
+        int y, x;
+        getyx(stdscr, y, x); // Récupère la position actuelle du curseur (y, x)
+        move(y, 0); // Déplace le curseur au début de la ligne courante
+        printw(newbuf.c_str());
+        printw("\nMoi : ");
+        refresh();
     
         for (int i = 0; i < TAILLE_BUF; i++)
             buffer[i]='\0';
     }
-
     close(sock);         // destruction du socket client
     pthread_exit(NULL);  // destruction du thread
 }
@@ -141,4 +144,11 @@ string saisie(string message) {
         }
     }
     return txtSaisie;
+}
+
+void fin(int sock) {
+    endwin(); // Nettoyage de ncurses
+    send(sock, MSG_DECO, strlen(MSG_DECO), 0);
+    printf("Déconection\n");
+	exit(EXIT_SUCCESS);
 }
