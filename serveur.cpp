@@ -18,6 +18,15 @@ int main(int argc, char const *argv[]) {
     int opt = 1,sig,i=0;
     struct sigaction action;
 	
+     // Initialisation de ncurses
+    initscr(); // initialise ncurses et prépare affichage
+    cbreak();  // désactive attente d'un retour à la ligne
+    noecho();   // désactive l'affichage auto des caractères saisies
+    keypad(stdscr, TRUE); // récupère les touches additionnelles 
+    start_color();
+    init_pair(1, COLOR_RED, COLOR_BLACK); // paire 1 = caractere noire sur fond rouge
+
+
     tabClient=NULL;
     compteurClients=0;
 
@@ -28,7 +37,7 @@ int main(int argc, char const *argv[]) {
     // Tableau des clients connectés
 	tabClient=(Client*)malloc((NBR_CO_MAX+1)*sizeof(Client));
 	if(tabClient==NULL) {
-		printf("Problème allocation\n");
+		printw("Problème allocation\n");
 		exit(EXIT_FAILURE);
 	}
 
@@ -57,9 +66,9 @@ int main(int argc, char const *argv[]) {
     // Récupération du PID
 	pid_t pid=getpid();
 
-	printf("Lancement du serveur !\n");
-	printf("PID=%d\n", pid);
-	printf("En attente de connexion d'un client ...\n\n");
+	printw("Lancement du serveur !\n");
+	printw("PID=%d\n", pid);
+	printw("En attente de connexion d'un client ...\n\n");
 
     // Indique au socket qu'il est prêt à accepter les connexions entrantes des clients. Il peut mettre en attente jusqu'à 3 connexions en même temps, les autres sont refusées
     if (listen(server_fd, NBR_CO_MAX) < 0) {
@@ -68,6 +77,8 @@ int main(int argc, char const *argv[]) {
     }
 
     while(1) {
+        // Rafraîchir l'écran
+        refresh();
         // Accepte une connexion entrante sur le socket et de créer un nouveau socket pour gérer cette connexion avec le client
         if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0 && compteurClients>=NBR_CO_MAX) {  // Bloquant
             perror("Erreur accepté de la connexion");
@@ -77,7 +88,7 @@ int main(int argc, char const *argv[]) {
         // Récupérer l'adresse IP du client
         char client_ip[INET_ADDRSTRLEN];
         inet_ntop(AF_INET, &(address.sin_addr), client_ip, INET_ADDRSTRLEN);
-        printf("Client connecté avec l'adresse IP : %s\n", client_ip);
+        printw("Client connecté avec l'adresse IP : %s\n", client_ip);
         user.ip=client_ip;
         user.socket=new_socket;
 
@@ -87,7 +98,7 @@ int main(int argc, char const *argv[]) {
             perror("Erreur de création d'un processus pour le client");
             exit(EXIT_FAILURE);
         }
-        printf("Processus %ld créé pour la communication du client\n\n", (long) thread_id);
+        printw("Processus %ld créé pour la communication du client\n\n", (long) thread_id);
     }
     return 0;
 }
@@ -97,7 +108,8 @@ void fin(int n) {
     {
         close(tabClient[i].socket);
     }
-	fprintf(stderr, "\nTerminaison du serveur.\n");
+    endwin(); // Nettoyage de ncurses
+	printf("\nTerminaison du serveur.\n");
 	exit(EXIT_SUCCESS);
 }
 
@@ -109,6 +121,8 @@ void *connection_handler(void *socket_desc) {
 
     // Lecture des données à partir du socket dans le tampon
     while((valread = read(sock, buffer, TAILLE_BUF)) > 0) { // Bloquant
+        // Rafraîchir l'écran
+        refresh();
         string newbuf(buffer);
         
         // Trouver la position du délimiteur (":")
@@ -122,7 +136,7 @@ void *connection_handler(void *socket_desc) {
         checkClient(sock);
 
         if(msg==MSG_DECO) {
-            cout << "Client " << nom << " déconnecté" << endl;
+            printw("Client " nom << " déconnecté" << endl;
             popClient();
             send(sock, MSG_DECO, strlen(buffer), 0);
             if (compteurClients==1)
@@ -183,7 +197,7 @@ void checkClient(int socket_desc) {
         user.color="\x1b["+to_string(31+compteurClients)+"m";
         if(compteurClients>NBR_CO_MAX) // limite de connexion 
         {
-            printf("\nNombre de clients maximum déjà atteint.\n");
+            printw("\nNombre de clients maximum déjà atteint.\n");
             close(socket_desc);
             pthread_exit(NULL);
         }
@@ -192,16 +206,16 @@ void checkClient(int socket_desc) {
             tabClient[compteurClients-1]=user;
             user=tabClient[compteurClients-1];
             afficheClients();
-            if(compteurClients==2) printf("Début du chat !\n");
+            if(compteurClients==2) printw("Début du chat !\n");
         }
     }
 }
 
 void afficheClients() {
-    printf("\nListe des clients :\n");
+    printw("\nListe des clients :\n");
     for(int i = 0; i < compteurClients; ++i)
     {
         cout << "\t" << tabClient[i].name << "\t-->\tIP = " << tabClient[i].ip << endl;
     }
-    printf("\n");
+    printw("\n");
 }

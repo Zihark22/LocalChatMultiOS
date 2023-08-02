@@ -17,6 +17,8 @@
 #include <iostream>
 #include <string>
 
+#include <ncurses.h>
+
 #define PORT 8080
 #define IPserveur "192.168.0.37"
 
