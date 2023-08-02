@@ -40,6 +40,16 @@ typedef struct {
 
 
 enum {NOIR,ROUGE,VERT,JAUNE,BLEU,MAGENTA,CYAN,BLANC};
+/*
+COLOR_BLACK : 0
+COLOR_RED : 1
+COLOR_GREEN : 2
+COLOR_YELLOW : 3
+COLOR_BLUE : 4
+COLOR_MAGENTA : 5
+COLOR_CYAN : 6
+COLOR_WHITE : 7
+*/
 
 // Séquences d'échappement ANSI 
 #define DEFAULT "\x1b[0m" 		// retour à la normale

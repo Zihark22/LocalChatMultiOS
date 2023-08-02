@@ -20,6 +20,7 @@ int main(int argc, char const *argv[]) {
     cbreak();  // désactive attente d'un retour à la ligne
     noecho();   // désactive l'affichage auto des caractères saisies
     keypad(stdscr, TRUE); // récupère les touches additionnelles 
+    scrollok(stdscr, TRUE); // Activer le défilement automatique
     start_color();
     for (int i = 0; i < 8; i++)
     {
@@ -128,7 +129,6 @@ void *reception_handler(void *socket_desc) {
         attroff(COLOR_PAIR(BLEU));
         attron(COLOR_PAIR(ROUGE));
         printw("\nMoi : ");
-        attroff(COLOR_PAIR(ROUGE));
         refresh();
     
         for (int i = 0; i < TAILLE_BUF; i++)

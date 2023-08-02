@@ -16,13 +16,13 @@ Elle utilise le protocole TCP qui est plus fiable et sécurisé.
 - V6 : Login des utilisateurs via un fichier 
 - V7 : Passage du réseau local à internet (sécuriser et adapter)
 
-idées : ajout de couleur pour chaque client , passage sous ncurses, voir les autres clients connectés, affichage défilement
+
 
 ### V1
 Le serveur reçoit un message du client et l'affiche.
 
 
-### V2
+### V2 
 Le serveur reçoit plusieurs clients en même temps
 
 
@@ -32,6 +32,7 @@ Les client peuvent se déconnecter en envoyant le message "!deco".
 ### V4
 Enregistrement des clients pour vérifier s'il doit être bloqué
 
+Idées : ajout de couleur pour chaque client , passage sous ncurses, voir les autres clients connectés, affichage défilement
 
 ## Explications du Code V4
 Ce code est un serveur C++ qui gère les connexions de plusieurs clients et permet un chat entre eux. Voici un aperçu détaillé de son fonctionnement global :
