@@ -157,13 +157,11 @@ void *connection_handler(void *socket_desc) {
         else {
             // Afficher le message
             string newbuffer = nom + " : " + msg;
-            attron(COLOR_PAIR(ROUGE));
+            attron(COLOR_PAIR(user.color));
             printw("%s",nom.c_str());
-            attroff(COLOR_PAIR(ROUGE));
+            attroff(COLOR_PAIR(user.color));
             printw(" : ");
-            attron(COLOR_PAIR(BLEU));
             printw("%s\n",msg.c_str());
-            attroff(COLOR_PAIR(BLEU));
             refresh();
 
             // Diffuser le message à tous les autres clients connectés
@@ -208,7 +206,7 @@ void checkClient(int socket_desc) {
     if(cmpt==compteurClients) 
     {
         compteurClients++;
-        user.color=to_string(31+compteurClients);
+        user.color=compteurClients+1;
         if(compteurClients>NBR_CO_MAX) // limite de connexion 
         {
             printw("\nNombre de clients maximum déjà atteint.\n");

@@ -34,7 +34,7 @@ using namespace std;
 typedef struct {  
 	string name;   
 	string ip;
-	string color;
+	int color;
 	int socket;
 } Client;
 
