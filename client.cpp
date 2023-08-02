@@ -21,6 +21,10 @@ int main(int argc, char const *argv[]) {
     noecho();   // désactive l'affichage auto des caractères saisies
     keypad(stdscr, TRUE); // récupère les touches additionnelles 
     start_color();
+    for (int i = 0; i < 8; i++)
+    {
+        init_pair( i , i , COLOR_BLACK );
+    }
 
     // on commence par prevoir la terminaison sur signal du serveur
 	action.sa_handler = fin;
@@ -64,13 +68,14 @@ int main(int argc, char const *argv[]) {
     pid_t pidP=getpid();
 
     // Affichage
+    attron(COLOR_PAIR(JAUNE));
     move(0,0); // Déplace le curseur au début de la ligne courante
     printw("Client opérationnel\n");
     printw("Nom client: %s\n",name.c_str());
     printw("PID=%d\n",pidP);
     printw("IP=",client_ip);
     printw("Bienvenu dans le chat !\n\n");
-
+    attroff(COLOR_PAIR(JAUNE));
 
     char send_message[TAILLE_MSG+TAILLE_NOM] = {0};
     sprintf(send_message, "%s : %s", name.c_str(), "co");
@@ -86,7 +91,9 @@ int main(int argc, char const *argv[]) {
 
     while(1)
     {
+        attron(COLOR_PAIR(ROUGE));
         message=saisie("Moi : ");
+        attroff(COLOR_PAIR(ROUGE));
 
         string send_message = name + " : " + message;
 
@@ -116,8 +123,12 @@ void *reception_handler(void *socket_desc) {
         int y, x;
         getyx(stdscr, y, x); // Récupère la position actuelle du curseur (y, x)
         move(y, 0); // Déplace le curseur au début de la ligne courante
+        attron(COLOR_PAIR(BLEU));
         printw(newbuf.c_str());
+        attroff(COLOR_PAIR(BLEU));
+        attron(COLOR_PAIR(ROUGE));
         printw("\nMoi : ");
+        attroff(COLOR_PAIR(ROUGE));
         refresh();
     
         for (int i = 0; i < TAILLE_BUF; i++)
