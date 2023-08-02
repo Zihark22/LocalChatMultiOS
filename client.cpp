@@ -2,14 +2,18 @@
 
 void *reception_handler(void *socket_desc);
 string saisie(string message);
-void fin(int sock);
+void fin(int n);
 
+int sock;
+string name;
 
 int main(int argc, char const *argv[]) {
-    int valread,sock=0;
+    int valread;
     struct sockaddr_in serv_addr;
-    string name, message;
+    string message;
     struct sigaction action;
+
+    sock=0;
 
     // Initialisation de ncurses
     initscr(); // initialise ncurses et prépare affichage
@@ -92,20 +96,21 @@ int main(int argc, char const *argv[]) {
 
         printw("\n");
         if(message==MSG_DECO)
-            fin(sock);
+            break;
     }
+    fin(0);
     return 0;
 }
 
 void *reception_handler(void *socket_desc) {
-    int sock = *(int *)socket_desc;
+    int socket = *(int *)socket_desc;
     int valread;
     char buffer[TAILLE_BUF];
     string nom, msg;
 
     // Lecture des données à partir du socket dans le tampon
     while(1) { 
-        valread = read(sock, buffer, TAILLE_BUF); // Bloquant
+        valread = read(socket, buffer, TAILLE_BUF); // Bloquant
         string newbuf(buffer);
         if(newbuf==MSG_DECO)
             break;
@@ -119,7 +124,7 @@ void *reception_handler(void *socket_desc) {
         for (int i = 0; i < TAILLE_BUF; i++)
             buffer[i]='\0';
     }
-    close(sock);         // destruction du socket client
+    close(socket);         // destruction du socket client
     pthread_exit(NULL);  // destruction du thread
 }
 
@@ -146,9 +151,10 @@ string saisie(string message) {
     return txtSaisie;
 }
 
-void fin(int sock) {
+void fin(int n) {
+    string msgFin = name + " : " + MSG_DECO;
+    send(sock, msgFin.c_str(), strlen(msgFin.c_str()), 0);
     endwin(); // Nettoyage de ncurses
-    send(sock, MSG_DECO, strlen(MSG_DECO), 0);
-    printf("Déconection\n");
+    printf("Déconection");
 	exit(EXIT_SUCCESS);
 }

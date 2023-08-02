@@ -135,13 +135,14 @@ void *connection_handler(void *socket_desc) {
         checkClient(sock);
 
         if(msg==MSG_DECO) {
-            printw("Client ",nom.c_str()," déconnecté");
+            printw("Client %s déconnecté\n", nom.c_str());
             popClient();
             send(sock, MSG_DECO, strlen(buffer), 0);
             if (compteurClients==1)
-                printw("------- Fin du chat ! -------");
+                printw("\n------- Fin du chat ! -------\n\n");
             else if(compteurClients<1)
                 fin(compteurClients);
+            refresh();
             break;
         }
         else if(msg=="co") { // premier message auto pour enregistrer client
@@ -162,6 +163,7 @@ void *connection_handler(void *socket_desc) {
         }
         for (int i = 0; i < TAILLE_BUF; i++)
             buffer[i]='\0';
+        refresh();
     }
 
     close(sock);         // destruction du socket client
