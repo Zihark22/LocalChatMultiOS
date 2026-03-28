@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "__locale": "c",
+        "chrono": "c",
+        "functional": "c",
+        "socket.h": "c",
+        "iostream": "cpp",
+        "ostream": "cpp",
+        "iosfwd": "cpp"
+    }
+}
