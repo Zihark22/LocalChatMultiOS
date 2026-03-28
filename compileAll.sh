@@ -8,11 +8,12 @@ clear && printf '\e[3J' ;
 
 compile=false;
 
+mkdir -p build;
 
-g++ -o serveur_Mac serveur.cpp  # compilation serveur
+g++ -o build/serveur serveur.cpp -lncurses  # compilation serveur
 if [ $? -eq 0 ]; then
   echo "\033[36mCompilation server sucessful \033[0m"
-  g++ -o client_Mac client.cpp  # compilation client
+  g++ -o build/client client.cpp -lncurses  # compilation client
   if [ $? -eq 0 ]; then
     echo "\033[36mCompilation client sucessful \033[0m"
   else

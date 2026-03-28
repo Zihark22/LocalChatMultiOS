@@ -17,8 +17,10 @@
 #include <iostream>
 #include <string>
 
+#include <ncurses.h>
+
 #define PORT 8080
-#define IPserveur "192.168.0.37"
+#define IPserveur "192.168.1.176"
 
 #define TAILLE_MSG 1024
 #define TAILLE_BUF TAILLE_MSG
@@ -32,9 +34,22 @@ using namespace std;
 typedef struct {  
 	string name;   
 	string ip;
-	string color;
+	int color;
 	int socket;
 } Client;
+
+
+enum {NOIR,ROUGE,VERT,JAUNE,BLEU,MAGENTA,CYAN,BLANC};
+/*
+COLOR_BLACK : 0
+COLOR_RED : 1
+COLOR_GREEN : 2
+COLOR_YELLOW : 3
+COLOR_BLUE : 4
+COLOR_MAGENTA : 5
+COLOR_CYAN : 6
+COLOR_WHITE : 7
+*/
 
 // Séquences d'échappement ANSI 
 #define DEFAULT "\x1b[0m" 		// retour à la normale
